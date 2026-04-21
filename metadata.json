@@ -1,0 +1,7 @@
+{
+  "name": "綠電交易營運管理系統 (KIWI AI)",
+  "description": "這是一款專為 B2B 市場設計的 AI 綠能管理平台，提供售電與購電合約管理、電號即時監控、AI 電力智能匹配及自動化帳務結算服務，助力企業達成 RE100 能源轉型目標。",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
