@@ -2,9 +2,12 @@
   "name": "kiwi---ai-綠能智慧管理平台",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://youyajuju.github.io/kiwi_ai_match_demo/",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "build": "vite build",
     "lint": "tsc --noEmit",
     "preview": "vite preview"
@@ -28,6 +31,7 @@
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.5.0",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^4.2.3",
     "typescript": "~5.8.2",
