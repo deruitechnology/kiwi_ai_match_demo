@@ -194,7 +194,7 @@ const ConsumerHourlyChart = ({ item, globalSelectedDate, setGlobalSelectedDate, 
   return (
     <div className="flex flex-col gap-2 p-4">
       <div className="flex justify-between items-center px-4">
-        <span className="text-sm font-black text-[#54585a]">單日尖峰與獲配分析</span>
+        <span className="text-sm font-black text-[#54585a]">{t.billing.dailyAnalysis}</span>
         <input 
           type="date" 
           value={localDate}
@@ -218,7 +218,7 @@ const ConsumerHourlyChart = ({ item, globalSelectedDate, setGlobalSelectedDate, 
                   return (
                     <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-50">
                       <p className="text-[10px] font-black text-gray-400 mb-2">
-                        {label} {isPeak ? '(尖峰時段)' : ''}
+                        {label} {isPeak ? t.billing.peakHoursLabel : ''}
                       </p>
                       <div className="space-y-1">
                         <div className="flex justify-between gap-6">
@@ -230,7 +230,7 @@ const ConsumerHourlyChart = ({ item, globalSelectedDate, setGlobalSelectedDate, 
                           <span className="text-[10px] font-black text-gray-400">{formatPower(data.gray)}</span>
                         </div>
                         <div className="flex justify-between gap-6 pt-1 mt-1 border-t border-gray-50">
-                          <span className="text-[10px] font-bold text-[#54585a]">15分用電量</span>
+                          <span className="text-[10px] font-bold text-[#54585a]">{t.billing.usage15min}</span>
                           <span className="text-[10px] font-black text-gray-600">{formatPower(data.actual)}</span>
                         </div>
                       </div>
@@ -244,7 +244,7 @@ const ConsumerHourlyChart = ({ item, globalSelectedDate, setGlobalSelectedDate, 
             {/* @ts-ignore */}
             <ReferenceArea x1="09:00" x2="16:45" fill="#FFFBEB" fillOpacity={0.8} />
             <Bar dataKey="green" name={t.billing.allocatedGreen} stackId="a" fill="#6EE7B7" radius={[0, 0, 0, 0]} maxBarSize={15} />
-            <Bar dataKey="gray" name={`${t.billing.grayPower} (台電)`} stackId="a" fill="#e2e8f0" radius={[4, 4, 0, 0]} maxBarSize={15} />
+            <Bar dataKey="gray" name={`${t.billing.grayPower} (${t.matching.gridCompany})`} stackId="a" fill="#e2e8f0" radius={[4, 4, 0, 0]} maxBarSize={15} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -512,7 +512,7 @@ const Billing: React.FC = () => {
           <div className="overflow-x-auto no-scrollbar">
             <table className="w-full text-left min-w-[600px]">
               <thead>
-                <tr className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100">
+                <tr className={`bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase ${language === 'en' ? 'tracking-wider' : 'tracking-[0.2em]'} border-b border-gray-100`}>
                   <th className="px-4 md:px-8 py-4 md:py-5">{t.common.vatNumber}</th>
                   <th className="px-4 md:px-8 py-4 md:py-5">{t.common.customerName}</th>
                   <th className="px-4 md:px-8 py-4 md:py-5">{t.common.customerType}</th>
@@ -574,10 +574,10 @@ if (!selectedCustomer || !details) return null;
               <h2 className="text-xl md:text-2xl font-black text-gray-900">{selectedCustomer?.name}</h2>
             </div>
             <p className="text-xs md:text-sm text-gray-400 font-bold mt-1">
-              {t.common.vatNumber}：{selectedCustomer?.vatNumber} | 
-              {t.billing.customerType}：{isConsumer ? t.billing.consumerType : t.billing.generatorType} |
-              {t.billing.contractStatus}：<span className="text-[#1DD793]">{t.billing.active}</span> |
-              {t.billing.settlementMonth}：2026-02
+              {t.common.vatNumber}: {selectedCustomer?.vatNumber} | 
+              {t.billing.customerType}: {isConsumer ? t.billing.consumerType : t.billing.generatorType} |
+              {t.billing.contractStatus}: <span className="text-[#1DD793]">{t.billing.active}</span> |
+              {t.billing.settlementMonth}: 2026-02
             </p>
           </div>
         </div>
@@ -670,7 +670,7 @@ if (!selectedCustomer || !details) return null;
       <div className="bg-white p-4 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h3 className="text-xl font-black text-gray-900">{isConsumer ? "每日用電與獲配佔比分析" : t.billing.dailyTrend}</h3>
+            <h3 className="text-xl font-black text-gray-900">{isConsumer ? "每日用電與獲配佔比分析" : t.billing.wheelingTrend}</h3>
             {isConsumer && (
               <p className="text-xs font-bold text-gray-400 mt-1">
                 {t.billing.peakBenefit}
@@ -703,20 +703,22 @@ if (!selectedCustomer || !details) return null;
               </>
             ) : (
               <div className="flex items-center">
-                <div className="flex bg-gray-50 p-1 rounded-xl mr-6 border border-gray-100">
-                  <button 
-                    onClick={() => setChartView('trend')} 
-                    className={cn("px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all", chartView === 'trend' ? "bg-white text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-700")}
-                  >
-                    轉供趨勢
-                  </button>
-                  <button 
-                    onClick={() => setChartView('diff')} 
-                    className={cn("px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all", chartView === 'diff' ? "bg-white text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-700")}
-                  >
-                    匹配差異分析
-                  </button>
-                </div>
+                {!isConsumer ? null : (
+                  <div className="flex bg-gray-50 p-1 rounded-xl mr-6 border border-gray-100">
+                    <button 
+                      onClick={() => setChartView('trend')} 
+                      className={cn("px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all", chartView === 'trend' ? "bg-white text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-700")}
+                    >
+                      轉供趨勢
+                    </button>
+                    <button 
+                      onClick={() => setChartView('diff')} 
+                      className={cn("px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all", chartView === 'diff' ? "bg-white text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-700")}
+                    >
+                      匹配差異分析
+                    </button>
+                  </div>
+                )}
                 {chartView === 'trend' ? (
                   <>
                     <div className="flex items-center gap-2 text-[#F59E0B] mr-4">
@@ -731,7 +733,7 @@ if (!selectedCustomer || !details) return null;
                 ) : (
                   <div className="flex items-center gap-2 text-[#1DD793]">
                     <div className="w-3 h-3 bg-[#1DD793] rounded-sm"></div>
-                    <span>{t.billing.matchingDifference} (餘電)</span>
+                    <span>{t.billing.matchingDifference} ({t.billing.surplus})</span>
                   </div>
                 )}
               </div>
@@ -757,7 +759,7 @@ if (!selectedCustomer || !details) return null;
                 <Bar dataKey="green" name={t.billing.aiMatchedGreen} stackId="a" fill="#1DD793" radius={[0, 0, 0, 0]} barSize={30} />
                 <Bar dataKey="gray" name={t.billing.grayPower} stackId="a" fill="#e2e8f0" radius={[4, 4, 0, 0]} barSize={30} />
               </BarChart>
-            ) : chartView === 'trend' ? (
+            ) : (
               <ComposedChart data={producerChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 600, fill: '#94a3b8' }} />
@@ -798,34 +800,6 @@ if (!selectedCustomer || !details) return null;
                 <Bar dataKey="matched" name={t.billing.actualMatchedTransfer} fill="#38bdf8" radius={[4, 4, 0, 0]} barSize={20} />
                 <Line type="monotone" dataKey="actual" name={t.billing.actualMonthlyGeneration} stroke="#F59E0B" strokeWidth={3} dot={{ r: 3, fill: '#F59E0B', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
               </ComposedChart>
-            ) : (
-              <BarChart data={producerChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 600, fill: '#94a3b8' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 600, fill: '#94a3b8' }} />
-                <Tooltip 
-                  cursor={{ fill: '#f8fafc' }}
-                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', padding: '12px' }}
-                  content={({ active, payload, label }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      return (
-                        <div className="bg-white p-4 rounded-2xl shadow-xl border border-gray-50">
-                          <p className="text-xs font-black text-gray-400 mb-2 uppercase tracking-widest">{label} {t.billing.date}</p>
-                          <div className="space-y-2">
-                            <div className="flex justify-between gap-8 items-center">
-                              <span className="text-xs font-bold text-gray-500">匹配落差(餘電)</span>
-                              <span className="text-sm font-black text-[#1DD793]">+{formatEnergy(data.diff)}</span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Bar dataKey="diff" name="匹配落差" fill="#1DD793" radius={[4, 4, 0, 0]} barSize={20} />
-              </BarChart>
             )}
           </ResponsiveContainer>
         </div>
@@ -854,10 +828,10 @@ if (!selectedCustomer || !details) return null;
                 {isConsumer ? (
                   <>
                     <th className="px-6 py-4">{t.billing.contractMeter}</th>
-                    <th className="px-6 py-4">策略標籤</th>
-                    <th className="px-6 py-4">總用電量</th>
-                    <th className="px-6 py-4 text-right">目標量 / 獲配量</th>
-                    <th className="px-6 py-4 text-right">RE 比例</th>
+                    <th className="px-6 py-4">{t.billing.strategyWeight}</th>
+                    <th className="px-6 py-4">{t.billing.actualUsage}</th>
+                    <th className="px-6 py-4 text-right">{t.billing.monthlyTargetTransfer} / {t.billing.allocatedGreen}</th>
+                    <th className="px-6 py-4 text-right">{t.billing.reAchievementRate}</th>
                   </>
                 ) : (
                   <>
@@ -918,7 +892,7 @@ if (!selectedCustomer || !details) return null;
                               "text-[10px] font-black mt-1",
                               ((contract.totalAllocated || 0) / (contract.estGeneration || 1) * 100) >= 100 ? "text-[#1DD793]" : "text-rose-500"
                             )}>
-                              達成率: {((contract.totalAllocated || 0) / (contract.estGeneration || 1) * 100).toFixed(1)}%
+                              {t.billing.capacityAchievement}: {((contract.totalAllocated || 0) / (contract.estGeneration || 1) * 100).toFixed(1)}%
                             </span>
                           </>
                         ) : (
@@ -970,7 +944,7 @@ if (!selectedCustomer || !details) return null;
                           )}
                           <td className="px-6 py-4">
                             <span className="text-[10px] font-bold text-gray-500">
-                              {isConsumer ? formatEnergy(item.actualUsage || 0) : `${t.billing.equipmentType}：${item.type}`}
+                              {isConsumer ? formatEnergy(item.actualUsage || 0) : `${t.billing.equipmentType}: ${item.type}`}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-right">
@@ -985,7 +959,7 @@ if (!selectedCustomer || !details) return null;
                                   "text-[10px] font-black",
                                   ((item.allocatedGreen || 0) / (item.estGeneration || 1) * 100) >= 100 ? "text-[#1DD793]" : "text-rose-500"
                                 )}>
-                                  達成率: {((item.allocatedGreen || 0) / (item.estGeneration || 1) * 100).toFixed(1)}%
+                                  {t.billing.capacityAchievement}: {((item.allocatedGreen || 0) / (item.estGeneration || 1) * 100).toFixed(1)}%
                                 </span>
                               )}
                             </div>

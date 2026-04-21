@@ -794,7 +794,7 @@ const Assets: React.FC = () => {
             <div className="bg-white p-4 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col justify-center relative overflow-hidden">
               <div className="space-y-6 relative z-10">
                 <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">{t.assets.totalPartners}</p>
+                  <p className={`text-[10px] font-black text-gray-400 uppercase ${language === 'en' ? 'tracking-wider' : 'tracking-[0.2em]'} mb-2`}>{t.assets.totalPartners}</p>
                   <div className="flex items-end gap-2">
                     <h2 className="text-5xl font-black text-gray-900">{totalPartners}</h2>
                     <span className="text-lg font-bold text-gray-400 mb-1">{t.assets.units}</span>
@@ -974,7 +974,7 @@ const Assets: React.FC = () => {
         <div className="overflow-x-auto no-scrollbar">
           <table className="w-full text-left min-w-[800px]">
             <thead>
-              <tr className="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100">
+              <tr className={`bg-gray-50 text-[10px] font-black text-gray-400 uppercase ${language === 'en' ? 'tracking-wider' : 'tracking-[0.2em]'} border-b border-gray-100`}>
                 <th className="px-4 md:px-8 py-4 md:py-6">{t.common.vatNumber}</th>
                 <th className="px-4 md:px-8 py-4 md:py-6">{t.common.companyName}</th>
                 <th className="px-4 md:px-8 py-4 md:py-6">{t.common.customerType}</th>
@@ -1072,7 +1072,7 @@ const Assets: React.FC = () => {
         <div className="w-full lg:w-[30%] lg:sticky lg:top-8 space-y-6">
           <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl space-y-8">
             <div className="space-y-6">
-              <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-50 pb-4">{t.assets.basicInfo}</h3>
+              <h3 className={`text-xs font-black text-gray-400 uppercase ${language === 'en' ? 'tracking-wider' : 'tracking-[0.2em]'} border-b border-gray-50 pb-4`}>{t.assets.basicInfo}</h3>
               
               <div className="space-y-4">
                 <div className="flex gap-4">

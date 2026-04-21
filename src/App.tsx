@@ -70,21 +70,18 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Sidebar */}
       <aside 
         className={`${
-          isSidebarOpen ? 'w-64' : 'w-20'
+          isSidebarOpen ? (language === 'en' ? 'w-72' : 'w-64') : 'w-20'
         } ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         } fixed lg:relative flex-shrink-0 bg-white border-r border-[#E5E7EB] h-full flex flex-col transition-all duration-300 z-[70]`}
       >
         <div className={`p-5 flex items-center ${isSidebarOpen ? 'justify-between' : 'justify-center'}`}>
-          <div className="flex items-center gap-2 overflow-hidden">
-            <div className="w-10 h-10 bg-[#9CB13A] rounded-lg flex items-center justify-center flex-shrink-0">
-              <Zap className="text-white" size={24} fill="currentColor" />
-            </div>
-            {isSidebarOpen && (
-              <span className={`${language === 'zh' ? 'text-xl' : 'text-sm'} font-bold text-[#54585a] tracking-tight leading-tight`}>
-                {t.sidebar.ems}
-              </span>
-            )}
+          <div className="flex items-center gap-2 overflow-hidden px-1">
+            <img 
+              src={`${import.meta.env.BASE_URL}kiwi_logo_horiz.svg`} 
+              alt="KIWI AI" 
+              className={isSidebarOpen ? "h-8 w-auto" : "w-10 h-10 object-contain"} 
+            />
           </div>
           {isSidebarOpen && (
             <button 
@@ -205,8 +202,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <img src="https://picsum.photos/32/32?random=2" className="w-8 h-8 rounded-full border-2 border-white" />
             </div>
             <div className="text-right">
-              <p className="text-sm font-semibold text-[#54585a]">系統管理員</p>
-              <p className="text-xs text-[#54585a]">能源開發部</p>
+              <p className="text-sm font-semibold text-[#54585a]">{t.common.sysAdmin}</p>
+              <p className="text-xs text-[#54585a]">{t.common.energyDept}</p>
             </div>
           </div>
         </header>

@@ -237,7 +237,7 @@ const Monitoring: React.FC = () => {
         <div className="overflow-x-auto no-scrollbar">
           <table className="w-full text-left min-w-[1000px]">
             <thead>
-              <tr className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100">
+              <tr className={`bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase ${language === 'en' ? 'tracking-wider' : 'tracking-[0.2em]'} border-b border-gray-100`}>
                 <th className="px-8 py-6">{t.monitoring.meterStatus}</th>
                 <th className="px-8 py-6">{t.monitoring.assetCategory}</th>
                 <th className="px-8 py-6">{t.monitoring.meterUser}</th>

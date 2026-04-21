@@ -23,8 +23,12 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA] font-sans">
       <div className="w-full max-w-md px-8 py-12 bg-white rounded-[2.5rem] shadow-xl border border-gray-100">
         <div className="mb-10 text-center">
-          <div className="w-16 h-16 bg-[#9CB13A] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <Zap className="text-white" size={32} fill="currentColor" />
+          <div className="flex items-center justify-center mx-auto mb-8">
+            <img 
+              src={`${import.meta.env.BASE_URL}kiwi_logo_horiz.svg`} 
+              alt="KIWI AI" 
+              className="h-12 w-auto" 
+            />
           </div>
           <h2 className="text-3xl font-bold text-[#54585a] mb-3">{t.login.welcomeBack}</h2>
           <p className="text-[#54585a] opacity-70">{t.login.loginSubtitle}</p>

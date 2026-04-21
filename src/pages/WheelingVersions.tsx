@@ -60,7 +60,7 @@ interface Company {
 }
 
 const WheelingVersions: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVersion, setSelectedVersion] = useState('v3');
   const [meterSearch, setMeterSearch] = useState('');
@@ -72,12 +72,23 @@ const WheelingVersions: React.FC = () => {
   
   const [scheduledDate, setScheduledDate] = useState(formattedDefaultDate);
 
-  // Mock Versions
-  const versions: Version[] = [
-    { id: 'v3', version: 'v3', status: 'editing', date: '2026/03/25', remarks: 'KIWI-1234' },
-    { id: 'v2', version: 'v2', status: 'locked', date: '2026/02/01', remarks: 'KIWI-1234' },
-    { id: 'v1', version: 'v1', status: 'locked', date: '2026/01/01', remarks: 'KIWI-1234' },
-  ];
+  // Mock Versions moved to state
+  const [allVersions, setAllVersions] = useState<Version[]>([
+    { id: 'v3', version: 'v3', status: 'editing', date: '2026/03/25', remarks: 'KIWI-2025-003' },
+    { id: 'v2', version: 'v2', status: 'locked', date: '2026/02/01', remarks: 'KIWI-2025-002' },
+    { id: 'v1', version: 'v1', status: 'locked', date: '2026/01/01', remarks: 'KIWI-2025-001' },
+  ]);
+
+  const currentVersion = allVersions.find(v => v.id === selectedVersion);
+  const isLocked = currentVersion?.status === 'locked';
+
+  const handleToggleLock = () => {
+    setAllVersions(prev => prev.map(v => 
+      v.id === selectedVersion 
+        ? { ...v, status: v.status === 'locked' ? 'editing' : 'locked' } 
+        : v
+    ));
+  };
 
   const [companies, setCompanies] = useState<Company[]>(() => {
     return INITIAL_CLIENTS.map((client) => ({
@@ -146,7 +157,7 @@ const WheelingVersions: React.FC = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
-            {versions.map((v) => (
+            {allVersions.map((v) => (
               <button
                 key={v.id}
                 onClick={() => setSelectedVersion(v.id)}
@@ -166,7 +177,10 @@ const WheelingVersions: React.FC = () => {
                   </span>
                   <div className="flex items-center gap-1">
                     {v.status === 'locked' ? (
-                      <Lock size={14} className="text-gray-400" />
+                      <div className="flex items-center gap-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded-md font-bold text-[10px]">
+                        <Lock size={10} />
+                        {t.wheelingVersions.locked}
+                      </div>
                     ) : (
                       <span className="text-[10px] px-1.5 py-0.5 bg-yellow-100 text-yellow-700 rounded-md font-bold">
                         {t.wheelingVersions.editing}
@@ -189,9 +203,17 @@ const WheelingVersions: React.FC = () => {
           </div>
 
           <div className="p-4 border-t border-gray-100 bg-gray-50/50">
-            <button className="w-full py-3 bg-[#54585a] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#404345] transition-all shadow-lg shadow-gray-200">
-              <Lock size={18} />
-              {t.wheelingVersions.lockActivate}
+            <button 
+              onClick={handleToggleLock}
+              className={cn(
+                "w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95",
+                isLocked 
+                  ? "bg-gray-200 text-gray-500 shadow-none cursor-pointer hover:bg-gray-300" 
+                  : "bg-[#54585a] text-white hover:bg-[#404345] shadow-gray-200"
+              )}
+            >
+              {isLocked ? <RefreshCw size={18} /> : <Lock size={18} />}
+              {isLocked ? (language === 'zh' ? '解鎖編輯' : 'Unlock Editor') : t.wheelingVersions.lockActivate}
             </button>
           </div>
         </aside>
@@ -217,8 +239,12 @@ const WheelingVersions: React.FC = () => {
                   <input 
                     type="text" 
                     value={scheduledDate}
+                    disabled={isLocked}
                     onChange={(e) => setScheduledDate(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#9CB13A]/20"
+                    className={cn(
+                      "w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#9CB13A]/20 transition-all",
+                      isLocked && "opacity-60 cursor-not-allowed"
+                    )}
                   />
                 </div>
               </div>
@@ -231,7 +257,11 @@ const WheelingVersions: React.FC = () => {
                   <input 
                     type="text" 
                     defaultValue="2026/04/01"
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#9CB13A]/20"
+                    disabled={isLocked}
+                    className={cn(
+                      "w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#9CB13A]/20 transition-all",
+                      isLocked && "opacity-60 cursor-not-allowed"
+                    )}
                   />
                 </div>
               </div>
@@ -243,7 +273,12 @@ const WheelingVersions: React.FC = () => {
               </label>
               <textarea 
                 placeholder="..."
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#9CB13A]/20 h-20 resize-none"
+                disabled={isLocked}
+                className={cn(
+                  "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#9CB13A]/20 h-20 resize-none transition-all",
+                  isLocked && "opacity-60 cursor-not-allowed"
+                )}
+                defaultValue={currentVersion?.remarks}
               />
             </div>
           </div>
@@ -318,8 +353,11 @@ const WheelingVersions: React.FC = () => {
                                       <input 
                                         type="checkbox" 
                                         checked={meter.checked}
-                                        disabled={meter.disabled}
-                                        className="w-4 h-4 rounded border-gray-300 text-[#9CB13A] focus:ring-[#9CB13A]"
+                                        disabled={meter.disabled || isLocked}
+                                        className={cn(
+                                          "w-4 h-4 rounded border-gray-300 text-[#9CB13A] focus:ring-[#9CB13A] transition-all",
+                                          isLocked && "opacity-50 cursor-not-allowed grayscale"
+                                        )}
                                         readOnly
                                       />
                                       <div className="flex flex-col">
@@ -329,10 +367,10 @@ const WheelingVersions: React.FC = () => {
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <span className="text-[10px] text-gray-400 font-bold uppercase">
-                                        {meter.type === 'consumer' ? "用電" : "供電"}
+                                        {meter.type === 'consumer' ? t.common.consumption : t.common.supply}
                                       </span>
                                       {meter.disabled && (
-                                        <div className="w-5 h-5 bg-red-50 rounded flex items-center justify-center" title="已停用">
+                                        <div className="w-5 h-5 bg-red-50 rounded flex items-center justify-center" title={t.common.disabled}>
                                           <AlertCircle className="text-red-500" size={12} />
                                         </div>
                                       )}
@@ -380,8 +418,8 @@ const WheelingVersions: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-green-700 mb-1">{t.wheelingVersions.added}</p>
-                  <p className="text-sm font-bold text-[#54585a]">台北信義門市</p>
-                  <p className="text-[10px] text-gray-400 font-mono mt-0.5">00-12-3456-78-9</p>
+                  <p className="text-sm font-bold text-[#54585a]">{language === 'zh' ? '全家便利商店 門市 #3' : 'FamilyMart Store #3'}</p>
+                  <p className="text-[10px] text-gray-400 font-mono mt-0.5">00-11223344-03</p>
                 </div>
               </div>
             </div>
@@ -395,8 +433,8 @@ const WheelingVersions: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-red-700 mb-1">{t.wheelingVersions.removed}</p>
-                  <p className="text-sm font-bold text-[#54585a]">台中高鐵門市</p>
-                  <p className="text-[10px] text-gray-400 font-mono mt-0.5">00-98-7654-32-1</p>
+                  <p className="text-sm font-bold text-[#54585a]">{language === 'zh' ? '苗栗通霄風力發電廠 #2' : 'Miaoli Wind Farm #2'}</p>
+                  <p className="text-[10px] text-gray-400 font-mono mt-0.5">99-00112233-02</p>
                 </div>
               </div>
             </div>
@@ -410,6 +448,7 @@ const WheelingVersions: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-xs font-bold text-amber-700 mb-1">{t.wheelingVersions.dateChanged}</p>
+                  <p className="text-[10px] font-bold text-[#54585a] mb-1">{language === 'zh' ? '屏東大武太陽能案場' : 'Pingtung Solar Plant'}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs text-gray-400 line-through">2026/03/01</span>
                     <ChevronRight size={12} className="text-gray-400" />
