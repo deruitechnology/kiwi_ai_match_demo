@@ -1,4 +1,4 @@
-# Kiwi AI - 綠能智慧管理平台 (Green Energy Smart Management Platform)
+# Kiwi AI 綠電匹配平台 
 
 
 這是一個專為綠能交易設計的運營管理系統，結合 AI 匹配技術與直覺化的數據視覺化工具，協助企業與發電案場優化綠電轉供效率與結算流程。
