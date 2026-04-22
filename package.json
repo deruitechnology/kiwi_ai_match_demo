@@ -2,7 +2,7 @@
   "name": "kiwi---ai-綠能智慧管理平台",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://youyajuju.github.io/kiwi_ai_match_demo/",
+  "homepage": "https://deruitechnology.github.io/kiwi_ai_match_demo/",
   "type": "module",
   "scripts": {
     "dev": "vite",
