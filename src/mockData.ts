@@ -53,7 +53,8 @@ const generateGlobalData = () => {
     equipmentType: 'type1',
     pmi: 100,
     annualTransferLimit: genCapacity * 1000,
-    annualAgreedSupplyDemand: genCapacity * 1000 // 14,000,000 kWh
+    annualAgreedSupplyDemand: genCapacity * 1000, // 14,000,000 kWh
+    guaranteedPurchaseRatio: 90
   };
 
   contracts.push(genContract);

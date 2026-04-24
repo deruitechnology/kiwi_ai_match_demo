@@ -510,6 +510,9 @@ export const translations = {
       peakHoursLabel: "(尖峰時段)",
       dailyAnalysis: "單日尖峰與獲配分析",
       dailyUsageAllocationAnalysis: "每日用電與獲配佔比分析",
+      guaranteedPurchaseFloor: "保證收購底標",
+      met: "已達標",
+      notMet: "未達保證收購量",
     },
     login: {
       welcomeBack: "歡迎回來",
@@ -1093,6 +1096,9 @@ export const translations = {
       peakHoursLabel: "(Peak Hours)",
       dailyAnalysis: "Daily Peak & Allotment Analysis",
       dailyUsageAllocationAnalysis: "Daily Usage & Allocation Analysis",
+      guaranteedPurchaseFloor: "Guaranteed Purchase Floor",
+      met: "Met",
+      notMet: "Below Guaranteed Purchase",
     },
     login: {
       welcomeBack: "Welcome Back",

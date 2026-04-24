@@ -18,7 +18,9 @@ import {
   ArrowUpRight,
   Receipt,
   ExternalLink,
-  MoreHorizontal
+  MoreHorizontal,
+  Check,
+  AlertCircle
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -119,7 +121,7 @@ const MOCK_CUSTOMERS: Customer[] = INITIAL_CLIENTS.map((c, i) => ({
 
 // --- Components ---
 
-const KPICard = ({ title, value, unit, trend, trendValue, icon: Icon, colorClass, info }: any) => (
+const KPICard = ({ title, value, unit, trend, trendValue, icon: Icon, colorClass, info, subValue, badge }: any) => (
   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative group">
     <div className="flex justify-between items-start mb-4">
       <div className={cn("p-3 rounded-xl", colorClass)}>
@@ -143,10 +145,28 @@ const KPICard = ({ title, value, unit, trend, trendValue, icon: Icon, colorClass
       </div>
     </div>
     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{title}</p>
-    <div className="flex items-baseline gap-1">
+    <div className="flex items-baseline gap-1 mb-3">
       <h3 className="text-2xl font-black text-gray-900">{value}</h3>
       {unit && <span className="text-xs font-bold text-gray-500">{unit}</span>}
     </div>
+    {(subValue || badge) && (
+      <div className="flex items-center justify-between gap-2 pt-1">
+        {subValue && (
+          <span className="text-[10px] font-bold text-gray-400">{subValue}</span>
+        )}
+        {badge && (
+          <div className={cn(
+            "px-2 py-1 rounded-lg text-[10px] font-black flex items-center gap-1 border",
+            badge.type === 'success' 
+              ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+              : "bg-orange-50 text-orange-600 border-orange-100"
+          )}>
+            {badge.icon && <badge.icon size={12} />}
+            {badge.text}
+          </div>
+        )}
+      </div>
+    )}
   </div>
 );
 
@@ -629,40 +649,63 @@ if (!selectedCustomer || !details) return null;
             />
           </>
         ) : (
-          <>
-            <KPICard 
-              title={t.billing.monthlyTargetGeneration} 
-              value={formatEnergy(details.contracts.reduce((acc: number, c: any) => acc + (c.estGeneration || 0), 0)).split(' ')[0]} 
-              unit={formatEnergy(details.contracts.reduce((acc: number, c: any) => acc + (c.estGeneration || 0), 0)).split(' ')[1]} 
-              icon={Zap} 
-              colorClass="bg-[#F59E0B]" 
-              info={language === 'zh' ? "合約建檔時，該電號所設定的「該月份拆分目標」。" : "The monthly split target set for this meter during contract creation."}
-            />
-            <KPICard 
-              title={t.billing.actualMonthlyGeneration} 
-              value={formatEnergy(details.contracts.reduce((acc: number, c: any) => acc + (c.actualGeneration || 0), 0)).split(' ')[0]} 
-              unit={formatEnergy(details.contracts.reduce((acc: number, c: any) => acc + (c.actualGeneration || 0), 0)).split(' ')[1]} 
-              icon={TrendingUp} 
-              colorClass="bg-[#1DD793]" 
-              info={language === 'zh' ? "台電回傳檔案中，該發電設備當月真實過表的總度數。" : "The total actual generation for the month as reported by Taipower."}
-            />
-            <KPICard 
-              title={t.billing.actualMatchedTransfer} 
-              value={formatEnergy(details.contracts.reduce((acc: number, c: any) => acc + (c.matchedTransfer || 0), 0)).split(' ')[0]} 
-              unit={formatEnergy(details.contracts.reduce((acc: number, c: any) => acc + (c.matchedTransfer || 0), 0)).split(' ')[1]} 
-              icon={CheckCircle2} 
-              colorClass="bg-sky-400" 
-              info={t.billing.actualMatchedTransferInfo}
-            />
-            <KPICard 
-              title={t.billing.purchaseCost} 
-              value={Math.round(details.contracts.reduce((acc: number, c: any) => acc + (c.actualGeneration || 0), 0) * 4.5).toLocaleString()} 
-              unit={t.common.twd} 
-              icon={Receipt} 
-              colorClass="bg-slate-800" 
-              info={language === 'zh' ? "本月實際發電總量 × 合約約定購售電費率。" : "Total actual generation × Agreed purchase rate."}
-            />
-          </>
+          (() => {
+            const totalTargetGeneration = details.contracts.reduce((acc: number, c: any) => acc + (c.estGeneration || 0), 0);
+            const totalActualGeneration = details.contracts.reduce((acc: number, c: any) => acc + (c.actualGeneration || 0), 0);
+            const totalMatchedTransfer = details.contracts.reduce((acc: number, c: any) => acc + (c.matchedTransfer || 0), 0);
+            const totalPurchaseCost = details.contracts.reduce((acc: number, c: any) => acc + (c.actualGeneration || 0), 0) * 4.5;
+            
+            // Calculate Guaranteed Floor for the first contract (as a representative)
+            const guaranteedRatio = details.contracts[0]?.guaranteedPurchaseRatio || 90;
+            const guaranteedFloor = totalTargetGeneration * (guaranteedRatio / 100);
+            const isMet = totalMatchedTransfer >= guaranteedFloor;
+            const achievementRate = (totalMatchedTransfer / guaranteedFloor) * 100;
+
+            return (
+              <>
+                <KPICard 
+                  title={t.billing.monthlyTargetGeneration} 
+                  value={formatEnergy(totalTargetGeneration).split(' ')[0]} 
+                  unit={formatEnergy(totalTargetGeneration).split(' ')[1]} 
+                  icon={Zap} 
+                  colorClass="bg-[#F59E0B]" 
+                  info={language === 'zh' ? "合約建檔時，該電號所設定的「該月份拆分目標」。" : "The monthly split target set for this meter during contract creation."}
+                />
+                <KPICard 
+                  title={t.billing.actualMonthlyGeneration} 
+                  value={formatEnergy(totalActualGeneration).split(' ')[0]} 
+                  unit={formatEnergy(totalActualGeneration).split(' ')[1]} 
+                  icon={TrendingUp} 
+                  colorClass="bg-[#1DD793]" 
+                  info={language === 'zh' ? "台電回傳檔案中，該發電設備當月真實過表的總度數。" : "The total actual generation for the month as reported by Taipower."}
+                />
+                <KPICard 
+                  title={t.billing.actualMatchedTransfer} 
+                  value={formatEnergy(totalMatchedTransfer).split(' ')[0]} 
+                  unit={formatEnergy(totalMatchedTransfer).split(' ')[1]} 
+                  icon={CheckCircle2} 
+                  colorClass="bg-sky-400" 
+                  info={t.billing.actualMatchedTransferInfo}
+                  subValue={`${t.billing.guaranteedPurchaseFloor}：${formatEnergy(guaranteedFloor)}`}
+                  badge={{
+                    type: isMet ? 'success' : 'warning',
+                    icon: isMet ? Check : AlertCircle,
+                    text: isMet 
+                      ? `${t.billing.met} (${achievementRate.toFixed(1)}%)` 
+                      : t.billing.notMet
+                  }}
+                />
+                <KPICard 
+                  title={t.billing.purchaseCost} 
+                  value={Math.round(totalPurchaseCost).toLocaleString()} 
+                  unit={t.common.twd} 
+                  icon={Receipt} 
+                  colorClass="bg-slate-800" 
+                  info={language === 'zh' ? "本月實際發電總量 × 合約約定購售電費率。" : "Total actual generation × Agreed purchase rate."}
+                />
+              </>
+            );
+          })()
         )}
       </div>
 
