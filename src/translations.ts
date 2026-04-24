@@ -512,7 +512,7 @@ export const translations = {
       dailyUsageAllocationAnalysis: "每日用電與獲配佔比分析",
       guaranteedPurchaseFloor: "保證收購底標",
       met: "已達標",
-      notMet: "未達保證收購量",
+      notMet: "⚠️ 未達保證收購量",
     },
     login: {
       welcomeBack: "歡迎回來",
@@ -1098,7 +1098,7 @@ export const translations = {
       dailyUsageAllocationAnalysis: "Daily Usage & Allocation Analysis",
       guaranteedPurchaseFloor: "Guaranteed Purchase Floor",
       met: "Met",
-      notMet: "Below Guaranteed Purchase",
+      notMet: "⚠️ Below Guaranteed Purchase",
     },
     login: {
       welcomeBack: "Welcome Back",

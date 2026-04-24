@@ -159,7 +159,9 @@ const KPICard = ({ title, value, unit, trend, trendValue, icon: Icon, colorClass
             "px-2 py-1 rounded-lg text-[10px] font-black flex items-center gap-1 border",
             badge.type === 'success' 
               ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
-              : "bg-orange-50 text-orange-600 border-orange-100"
+              : badge.type === 'danger'
+                ? "bg-rose-50 text-rose-600 border-rose-100"
+                : "bg-orange-50 text-orange-600 border-orange-100"
           )}>
             {badge.icon && <badge.icon size={12} />}
             {badge.text}
@@ -688,7 +690,7 @@ if (!selectedCustomer || !details) return null;
                   info={t.billing.actualMatchedTransferInfo}
                   subValue={`${t.billing.guaranteedPurchaseFloor}：${formatEnergy(guaranteedFloor)}`}
                   badge={{
-                    type: isMet ? 'success' : 'warning',
+                    type: isMet ? 'success' : 'danger',
                     icon: isMet ? Check : AlertCircle,
                     text: isMet 
                       ? `${t.billing.met} (${achievementRate.toFixed(1)}%)` 
