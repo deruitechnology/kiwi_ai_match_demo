@@ -2381,6 +2381,15 @@ const Assets: React.FC = () => {
                   <Hash size={20} className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300" />
                 </div>
               </div>
+
+              {currentContractForMeter !== null && (
+                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex gap-3 items-start animate-in fade-in slide-in-from-bottom-2">
+                  <AlertCircle className="shrink-0 text-amber-500 mt-0.5" size={18} />
+                  <p className="text-xs font-bold text-amber-700 leading-relaxed">
+                    {(t.assets as any).meterTargetHint}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="p-10 bg-gray-50/50 flex gap-4">

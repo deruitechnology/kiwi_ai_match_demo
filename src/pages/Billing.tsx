@@ -33,6 +33,8 @@ import {
   ComposedChart,
   Line,
   ReferenceArea,
+  ReferenceLine,
+  Label,
   AreaChart,
   Area,
   Legend
@@ -344,6 +346,7 @@ const Billing: React.FC = () => {
           estGeneration,
           actualGeneration,
           matchedTransfer,
+          guaranteedPurchaseRatio: con.guaranteedPurchaseRatio,
           plants
         };
       })
@@ -816,6 +819,9 @@ if (!selectedCustomer || !details) return null;
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;
                       const isSurplus = data.diff >= 0;
+                      const guaranteedRatio = details.contracts[0]?.guaranteedPurchaseRatio || 90;
+                      const dailyGuaranteedFloor = (totalTargetGeneration / 31) * (guaranteedRatio / 100);
+                      
                       return (
                         <div className="bg-white p-4 rounded-2xl shadow-xl border border-gray-50">
                           <p className="text-xs font-black text-gray-400 mb-2 uppercase tracking-widest">{label} {t.billing.date}</p>
@@ -827,6 +833,10 @@ if (!selectedCustomer || !details) return null;
                             <div className="flex justify-between gap-8">
                               <span className="text-xs font-bold text-gray-500">{t.billing.actualMatchedTransfer}</span>
                               <span className="text-xs font-black text-sky-400">{formatEnergy(data.matched)}</span>
+                            </div>
+                            <div className="flex justify-between gap-8">
+                              <span className="text-xs font-bold text-gray-500">{t.billing.guaranteedPurchaseFloor}</span>
+                              <span className="text-xs font-black text-rose-400">{formatEnergy(dailyGuaranteedFloor)}</span>
                             </div>
                             <div className="pt-1.5 mt-1.5 border-t border-gray-50 flex justify-between gap-8">
                               <span className="text-xs font-bold text-gray-500">{t.billing.matchingDifference}</span>
@@ -841,6 +851,22 @@ if (!selectedCustomer || !details) return null;
                     return null;
                   }}
                 />
+                <Legend 
+                  verticalAlign="top" 
+                  align="right" 
+                  height={36} 
+                  iconType="circle" 
+                  wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }} 
+                />
+                <ReferenceLine 
+                  y={((details.contracts.reduce((acc: number, c: any) => acc + (c.estGeneration || 0), 0) / 31) * ((details.contracts[0]?.guaranteedPurchaseRatio || 90) / 100))} 
+                  stroke="#fb7185" 
+                  strokeDasharray="5 5" 
+                  strokeWidth={2}
+                >
+                  {/* @ts-ignore */}
+                  <Label value={t.billing.guaranteedPurchaseFloor} position="insideBottomRight" fill="#fb7185" fontSize={10} fontWeight="900" dy={-10} />
+                </ReferenceLine>
                 <Bar dataKey="matched" name={t.billing.actualMatchedTransfer} fill="#38bdf8" radius={[4, 4, 0, 0]} barSize={20} />
                 <Line type="monotone" dataKey="actual" name={t.billing.actualMonthlyGeneration} stroke="#F59E0B" strokeWidth={3} dot={{ r: 3, fill: '#F59E0B', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
               </ComposedChart>
