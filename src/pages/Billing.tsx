@@ -48,7 +48,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useLanguage } from '../LanguageContext';
-import { formatEnergy, formatPower } from '../utils/contractUtils';
+import { formatEnergy, formatPower, translateName } from '../utils/contractUtils';
 
 // --- Utility for Tailwind classes ---
 function cn(...inputs: ClassValue[]) {
@@ -379,7 +379,12 @@ const Billing: React.FC = () => {
 
   const filteredCustomers = useMemo(() => {
     return MOCK_CUSTOMERS.filter(c => {
-      const matchesSearch = c.name.includes(searchQuery) || c.vatNumber.includes(searchQuery);
+      const nameZh = c.name;
+      const nameEn = translateName(c.name, 'en');
+      const matchesSearch = 
+        nameZh.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        nameEn.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        c.vatNumber.includes(searchQuery);
       const matchesType = typeFilter === 'all' || c.type === typeFilter;
       return matchesSearch && matchesType;
     });
@@ -429,7 +434,7 @@ const Billing: React.FC = () => {
       details.contracts.forEach((contract: any) => {
         contract.meters?.forEach((meter: any) => {
           meter.dailyDetails.forEach((day: any) => {
-            csvContent += `${day.date},${contract.name},${meter.name}(${meter.id}),${day.actual},${day.green},${day.reRate}%\n`;
+            csvContent += `${day.date},${translateName(contract.name, language)},${translateName(meter.name, language)}(${meter.id}),${day.actual},${day.green},${day.reRate}%\n`;
           });
         });
       });
@@ -438,7 +443,7 @@ const Billing: React.FC = () => {
       details.contracts.forEach((contract: any) => {
         contract.plants?.forEach((plant: any) => {
           plant.dailyDetails.forEach((day: any) => {
-            csvContent += `${day.date},${contract.name},${plant.name}(${plant.id}),${day.baseline},${day.actual},${day.achievement}%\n`;
+            csvContent += `${day.date},${translateName(contract.name, language)},${translateName(plant.name, language)}(${plant.id}),${day.baseline},${day.actual},${day.achievement}%\n`;
           });
         });
       });
@@ -448,7 +453,7 @@ const Billing: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `${t.billing.settlementReport}_${selectedCustomer.name}_2026-02.csv`);
+    link.setAttribute("download", `${t.billing.settlementReport}_${translateName(selectedCustomer.name, language)}_2026-02.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -552,7 +557,7 @@ const Billing: React.FC = () => {
                   className="group cursor-pointer hover:bg-gray-50/50 transition-all"
                 >
                   <td className="px-4 md:px-8 py-4 md:py-6 text-sm font-mono font-bold text-gray-500">{customer.vatNumber}</td>
-                  <td className="px-4 md:px-8 py-4 md:py-6 text-sm font-black text-gray-900">{customer.name}</td>
+                  <td className="px-4 md:px-8 py-4 md:py-6 text-sm font-black text-gray-900">{translateName(customer.name, language)}</td>
                   <td className="px-4 md:px-8 py-4 md:py-6">
                     <span className={cn(
                       "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border",
@@ -583,6 +588,8 @@ const Billing: React.FC = () => {
 // Detail View Logic
 if (!selectedCustomer || !details) return null;
 
+const totalTargetGeneration = details.contracts.reduce((acc: number, c: any) => acc + (c.estGeneration || 0), 0);
+
   return (
     <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
       {/* Detail Header */}
@@ -596,7 +603,7 @@ if (!selectedCustomer || !details) return null;
           </button>
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-xl md:text-2xl font-black text-gray-900">{selectedCustomer?.name}</h2>
+              <h2 className="text-xl md:text-2xl font-black text-gray-900">{translateName(selectedCustomer?.name || '', language)}</h2>
             </div>
             <p className="text-xs md:text-sm text-gray-400 font-bold mt-1">
               {t.common.vatNumber}: {selectedCustomer?.vatNumber} | 
@@ -928,7 +935,7 @@ if (!selectedCustomer || !details) return null;
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="text-sm font-black text-gray-900">{contract.name}</span>
+                        <span className="text-sm font-black text-gray-900">{translateName(contract.name, language)}</span>
                         <span className="text-[10px] text-gray-400 font-bold font-mono uppercase tracking-tighter">{contract.id}</span>
                       </div>
                     </td>
@@ -1003,7 +1010,7 @@ if (!selectedCustomer || !details) return null;
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
-                              <span className="text-xs font-bold text-gray-700">{item.name}</span>
+                              <span className="text-xs font-bold text-gray-700">{translateName(item.name, language)}</span>
                               <span className="text-[9px] text-gray-400 font-mono">{item.id}</span>
                             </div>
                           </td>

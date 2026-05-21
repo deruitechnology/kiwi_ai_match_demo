@@ -53,7 +53,7 @@ import {
 } from '../mockData';
 import { NodeType, AIStrategy, MeterStatus } from '../types';
 import { useLanguage } from '../LanguageContext';
-import { formatEnergy } from '../utils/contractUtils';
+import { formatEnergy, translateName } from '../utils/contractUtils';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -226,7 +226,7 @@ const SankeyDiagram: React.FC<SankeyProps> = ({ nodes, links, onLinkClick, forma
         .attr("text-anchor", (d: any) => d.x0 < innerWidth / 2 ? "end" : "start")
         .attr("fill", (d: any) => d.isSearched ? "#8B5CF6" : "#54585a")
         .attr("class", "text-[10px] font-black pointer-events-none")
-        .text((d: any) => d.displayName || d.companyName || d.label);
+        .text((d: any) => translateName(d.displayName || d.companyName || d.label, language));
 
       node.append("text")
         .attr("x", (d: any) => d.x0 < innerWidth / 2 ? -15 : d.x1 + 15)
@@ -442,10 +442,19 @@ const Matching: React.FC = () => {
   const searchResults = useMemo(() => {
     if (!searchMeterId.trim()) return [];
     const query = searchMeterId.toLowerCase().trim();
-    return MONITORED_METERS.filter(m => 
-      m.taipowerId.toLowerCase().includes(query) || 
-      m.customerName.toLowerCase().includes(query)
-    ).slice(0, 5); // 顯示前5筆建議
+    return MONITORED_METERS.filter(m => {
+      const nameZh = m.customerName || '';
+      const nameEn = translateName(nameZh, 'en');
+      const dispZh = m.displayName || '';
+      const dispEn = translateName(dispZh, 'en');
+      return (
+        m.taipowerId.toLowerCase().includes(query) || 
+        nameZh.toLowerCase().includes(query) ||
+        nameEn.toLowerCase().includes(query) ||
+        dispZh.toLowerCase().includes(query) ||
+        dispEn.toLowerCase().includes(query)
+      );
+    }).slice(0, 5); // 顯示前5筆建議
   }, [searchMeterId]);
 
   const coverageRate = useMemo(() => {
@@ -499,11 +508,22 @@ const Matching: React.FC = () => {
       }
     });
 
-    const exactSearchId = searchMeterId.trim();
+    const exactSearchId = searchMeterId.trim().toLowerCase();
     let searchedNodeId: string | null = null;
     
     if (exactSearchId) {
-        const found = rawNodes.find(n => n.label.includes(exactSearchId));
+        const found = rawNodes.find(n => {
+          const label = (n.label || '').toLowerCase();
+          const disp = (n.displayName || '').toLowerCase();
+          const comp = (n.companyName || '').toLowerCase();
+          const dispEn = translateName(n.displayName || '', 'en').toLowerCase();
+          const compEn = translateName(n.companyName || '', 'en').toLowerCase();
+          return label.includes(exactSearchId) || 
+                 disp.includes(exactSearchId) || 
+                 comp.includes(exactSearchId) || 
+                 dispEn.includes(exactSearchId) || 
+                 compEn.includes(exactSearchId);
+        });
         if (found) searchedNodeId = found.id;
     }
 
@@ -570,9 +590,9 @@ const Matching: React.FC = () => {
     if (otherBuyersCount > 0 && otherBuyersAmount > 0) {
         displayNodes.push({
             id: 'B-OTHER',
-            label: '其他未顯示',
-            companyName: `其他 ${otherBuyersCount} 個用電戶`,
-            displayName: '其他用電戶',
+            label: language === 'zh' ? '其他未顯示' : 'Others',
+            companyName: language === 'zh' ? `其他 ${otherBuyersCount} 個用電戶` : `Other ${otherBuyersCount} consumers`,
+            displayName: language === 'zh' ? '其他用電戶' : 'Other consumers',
             type: NodeType.CONSUMER
         });
 
@@ -594,7 +614,7 @@ const Matching: React.FC = () => {
     displayNodes = displayNodes.filter(n => n.type === NodeType.CONSUMER || activeNodeIds.has(n.id) || n.id === searchedNodeId || n.isSearched);
 
     return { nodes: displayNodes, links: displayLinks, otherBuyersCount, otherBuyersAmount };
-  }, [searchMeterId, solarEfficiency, hour, isHistorical, t]);
+  }, [searchMeterId, solarEfficiency, hour, isHistorical, t, language]);
 
   // --- New Execution Summary Logic ---
   const executionSummary = useMemo(() => {
@@ -989,7 +1009,7 @@ const Matching: React.FC = () => {
                         className="w-full text-left px-4 py-2 hover:bg-gray-50 flex flex-col gap-1 border-b border-gray-50 last:border-0"
                       >
                         <span className="text-[11px] font-black text-gray-800 font-mono">{m.taipowerId}</span>
-                        <span className="text-[10px] text-gray-400 font-bold">{m.customerName}</span>
+                        <span className="text-[10px] text-gray-400 font-bold">{translateName(m.customerName, language)}</span>
                       </button>
                     ))}
                   </div>
@@ -1017,8 +1037,8 @@ const Matching: React.FC = () => {
               <div className="space-y-6">
                 <div className="relative">
                   <div className="absolute left-3 top-0 bottom-0 w-px border-l border-dashed border-gray-200"></div>
-                  <div className="relative flex items-start gap-6 mb-6"><div className="w-6 h-6 rounded-full bg-[#F59E0B] z-10 border-4 border-white shadow-sm"></div><div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.matching.generatorMeterId}</p><p className="text-xs font-black text-gray-800">{selectedPath.source.displayName || selectedPath.source.companyName}</p><p className="text-[10px] text-gray-400 font-mono">{selectedPath.source.label}</p></div></div>
-                  <div className="relative flex items-start gap-6"><div className="w-6 h-6 rounded-full bg-[#3B82F6] z-10 border-4 border-white shadow-sm"></div><div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.matching.consumerMeterId}</p><p className="text-xs font-black text-gray-800">{selectedPath.target.displayName || selectedPath.target.companyName}</p><p className="text-[10px] text-gray-400 font-mono">{selectedPath.target.label}</p></div></div>
+                  <div className="relative flex items-start gap-6 mb-6"><div className="w-6 h-6 rounded-full bg-[#F59E0B] z-10 border-4 border-white shadow-sm"></div><div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.matching.generatorMeterId}</p><p className="text-xs font-black text-gray-800">{translateName(selectedPath.source.displayName || selectedPath.source.companyName, language)}</p><p className="text-[10px] text-gray-400 font-mono">{selectedPath.source.label}</p></div></div>
+                  <div className="relative flex items-start gap-6"><div className="w-6 h-6 rounded-full bg-[#3B82F6] z-10 border-4 border-white shadow-sm"></div><div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.matching.consumerMeterId}</p><p className="text-xs font-black text-gray-800">{translateName(selectedPath.target.displayName || selectedPath.target.companyName, language)}</p><p className="text-[10px] text-gray-400 font-mono">{selectedPath.target.label}</p></div></div>
                 </div>
                 <div className="pt-6 border-t border-gray-100">
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">分配量</p>

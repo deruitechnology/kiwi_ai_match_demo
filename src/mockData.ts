@@ -164,7 +164,7 @@ const generateGlobalData = () => {
   });
 
   // 1.2 Generate 1 Retail Consumer (Buyer)
-  const consumerName = '全家便利商店 (股)公司';
+  const consumerName = '連鎖便利商店';
   const conVat = '50000001';
   const conCapacity = 8000; // Adjusted for 6:4 ratio (Total Demand 16MW)
   
@@ -246,7 +246,7 @@ const generateGlobalData = () => {
   });
 
   // 1.3 Generate Nitori Consumer (Buyer)
-  const ikeaName = '宜得利家居 (Nitori) 台灣';
+  const ikeaName = '知名連鎖家居商';
   const ikeaVat = '50000002';
   const ikeaStores = ['敦北店', '新莊店', '桃園店', '台中店', '高雄店'];
   
@@ -335,7 +335,7 @@ if (clients.length > 2) {
   // Pending Contract for FamilyMart
   const pendingMeters: MeterConfig[] = Array.from({ length: 5 }, (_, i) => ({
     taipowerId: `0011223355${i}`,
-    displayName: `全家 2026 預計增購門市 #${i + 1}`,
+    displayName: `連鎖 2026 預計增購門市 #${i + 1}`,
     rate: 5.8,
     basePrice: 5.8,
     annualTargetKwh: 1000000, // 1 GWh per store
@@ -345,7 +345,7 @@ if (clients.length > 2) {
 
   clients[2].contracts.push({
     id: 'C-2026-PENDING',
-    name: '全家 2026 綠電增購合約',
+    name: '連鎖 2026 綠電增購合約',
     type: 'sale',
     companyName: clients[2].name,
     vatNumber: clients[2].vatNumber,
@@ -366,7 +366,7 @@ if (clients.length > 2) {
   // Expiring Soon Contract for FamilyMart
   const soonMeters: MeterConfig[] = Array.from({ length: 2 }, (_, i) => ({
     taipowerId: `0011223366${i}`,
-    displayName: `全家 2024 續約門市 #${i + 1}`,
+    displayName: `連鎖 2024 續約門市 #${i + 1}`,
     rate: 5.4,
     basePrice: 5.4,
     annualTargetKwh: 1000000, // 1 GWh per store
@@ -376,7 +376,7 @@ if (clients.length > 2) {
 
   clients[2].contracts.push({
     id: 'C-2026-SOON',
-    name: '全家 2024 舊案續約合約',
+    name: '連鎖 2024 舊案續約合約',
     type: 'sale',
     companyName: clients[2].name,
     vatNumber: clients[2].vatNumber,
@@ -397,7 +397,7 @@ if (clients.length > 2) {
   // Expired Contract for FamilyMart
   clients[2].contracts.push({
     id: 'C-2025-EXPIRED',
-    name: '全家 2023 歷史測試案',
+    name: '連鎖 2023 歷史測試案',
     type: 'sale',
     companyName: clients[2].name,
     vatNumber: clients[2].vatNumber,
@@ -454,7 +454,7 @@ export const BUYERS: Buyer[] = INITIAL_CONTRACTS
   .map(c => ({
     id: c.id,
     name: c.companyName,
-    industry: (c.companyName.includes('全家') || c.companyName.includes('IKEA')) ? IndustryType.RETAIL : IndustryType.MANUFACTURING,
+    industry: (c.companyName.includes('連鎖') || c.companyName.includes('IKEA')) ? IndustryType.RETAIL : IndustryType.MANUFACTURING,
     contractCapacity: c.agreedCapacity,
     re100Target: c.companyName.includes('IKEA') ? 100 : 80,
     status: 'normal'

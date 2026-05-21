@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../LanguageContext';
+import { translateName } from '../utils/contractUtils';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { INITIAL_CLIENTS } from '../mockData';
@@ -313,9 +314,9 @@ const WheelingVersions: React.FC = () => {
                       className="flex items-center gap-2 w-full text-left group"
                     >
                       {company.expanded ? <ChevronDown size={18} className="text-gray-400" /> : <ChevronRight size={18} className="text-gray-400" />}
-                      <span className="font-bold text-[#9CB13A]">{company.name}</span>
+                      <span className="font-bold text-[#9CB13A]">{translateName(company.name, language)}</span>
                     </button>
-
+ 
                     {company.expanded && (
                       <div className="ml-6 space-y-3">
                         {company.contracts.map((contract) => (
@@ -326,7 +327,7 @@ const WheelingVersions: React.FC = () => {
                                 className="flex items-center gap-2 text-left"
                               >
                                 {contract.expanded ? <ChevronDown size={16} className="text-gray-400" /> : <ChevronRight size={16} className="text-gray-400" />}
-                                <span className="text-sm font-bold text-[#54585a]">{contract.name}</span>
+                                <span className="text-sm font-bold text-[#54585a]">{translateName(contract.name, language)}</span>
                               </button>
                               <div className="flex items-center gap-3">
                                 <span className="text-[10px] text-gray-400 font-mono">{contract.contractId}</span>
@@ -338,7 +339,7 @@ const WheelingVersions: React.FC = () => {
                                 </span>
                               </div>
                             </div>
-
+ 
                             {contract.expanded && (
                               <div className="ml-6 space-y-1">
                                 {contract.meters.map((meter) => (
@@ -362,7 +363,7 @@ const WheelingVersions: React.FC = () => {
                                       />
                                       <div className="flex flex-col">
                                         <span className="text-sm font-medium text-[#54585a]">{meter.meterId}</span>
-                                        <span className="text-[10px] text-gray-400">{meter.name}</span>
+                                        <span className="text-[10px] text-gray-400">{translateName(meter.name, language)}</span>
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -418,12 +419,12 @@ const WheelingVersions: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-green-700 mb-1">{t.wheelingVersions.added}</p>
-                  <p className="text-sm font-bold text-[#54585a]">{language === 'zh' ? '全家便利商店 門市 #3' : 'FamilyMart Store #3'}</p>
+                  <p className="text-sm font-bold text-[#54585a]">{translateName('連鎖便利商店 門市 #3', language)}</p>
                   <p className="text-[10px] text-gray-400 font-mono mt-0.5">00-11223344-03</p>
                 </div>
               </div>
             </div>
-
+ 
             {/* Removed Card */}
             <div className="bg-red-50/50 border border-red-100 rounded-xl p-4 relative overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />
@@ -433,12 +434,12 @@ const WheelingVersions: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-red-700 mb-1">{t.wheelingVersions.removed}</p>
-                  <p className="text-sm font-bold text-[#54585a]">{language === 'zh' ? '苗栗通霄風力發電廠 #2' : 'Miaoli Wind Farm #2'}</p>
+                  <p className="text-sm font-bold text-[#54585a]">{translateName('苗栗通霄風力發電廠 #2', language)}</p>
                   <p className="text-[10px] text-gray-400 font-mono mt-0.5">99-00112233-02</p>
                 </div>
               </div>
             </div>
-
+ 
             {/* Modified Card */}
             <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 relative overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500" />
@@ -448,7 +449,7 @@ const WheelingVersions: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-xs font-bold text-amber-700 mb-1">{t.wheelingVersions.dateChanged}</p>
-                  <p className="text-[10px] font-bold text-[#54585a] mb-1">{language === 'zh' ? '屏東大武太陽能案場' : 'Pingtung Solar Plant'}</p>
+                  <p className="text-[10px] font-bold text-[#54585a] mb-1">{translateName('屏東大武太陽能案場', language)}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs text-gray-400 line-through">2026/03/01</span>
                     <ChevronRight size={12} className="text-gray-400" />

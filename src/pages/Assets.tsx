@@ -52,7 +52,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_CLIENTS, INITIAL_CONTRACTS } from '../mockData';
 import { Client, Contract, AIStrategy, MeterConfig, MeterStatus, ContractStatus } from '../types';
-import { calculateContractStatus, formatEnergy, formatPower, getStatusColor, getStatusDotColor } from '../utils/contractUtils';
+import { calculateContractStatus, formatEnergy, formatPower, getStatusColor, getStatusDotColor, translateName } from '../utils/contractUtils';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useLanguage } from '../LanguageContext';
@@ -649,6 +649,7 @@ const Assets: React.FC = () => {
   const filteredClients = useMemo(() => {
     return clients.filter(c => {
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                           translateName(c.name, 'en').toLowerCase().includes(searchQuery.toLowerCase()) || 
                            c.vatNumber.includes(searchQuery);
       const matchesType = filterType === 'all' || 
                          (filterType === 'generator' && c.type === 'generator') ||
@@ -747,10 +748,10 @@ const Assets: React.FC = () => {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-black text-gray-900">{contract.name}</h4>
+                            <h4 className="text-sm font-black text-gray-900">{translateName(contract.name, language)}</h4>
                             <span className="text-[10px] font-mono font-bold text-gray-400">{contract.id}</span>
                           </div>
-                          <p className="text-xs font-bold text-gray-400 mt-0.5">{contract.clientName}</p>
+                          <p className="text-xs font-bold text-gray-400 mt-0.5">{translateName(contract.clientName, language)}</p>
                         </div>
                       </div>
                       <div className="text-right flex flex-col items-end gap-1.5">
@@ -990,7 +991,7 @@ const Assets: React.FC = () => {
                     <span className="text-sm font-mono font-bold text-gray-500">{client.vatNumber}</span>
                   </td>
                   <td className="px-4 md:px-8 py-4 md:py-6">
-                    <span className="text-sm font-black text-gray-900 group-hover:text-blue-600 transition-colors">{client.name}</span>
+                    <span className="text-sm font-black text-gray-900 group-hover:text-blue-600 transition-colors">{translateName(client.name, language)}</span>
                   </td>
                   <td className="px-4 md:px-8 py-4 md:py-6">
                     <div className="flex gap-2">
@@ -1038,7 +1039,7 @@ const Assets: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl md:text-4xl font-black text-gray-900 tracking-tight">{client.name}</h1>
+              <h1 className="text-2xl md:text-4xl font-black text-gray-900 tracking-tight">{translateName(client.name, language)}</h1>
               <div className="shrink-0">
                 {client.type === 'generator' ? (
                   <span className="px-3 py-1 bg-[#F59E0B]/10 text-[#F59E0B] rounded-lg text-[10px] font-black border border-[#F59E0B]/20">{t.common.generator}</span>
@@ -1193,7 +1194,7 @@ const Assets: React.FC = () => {
                               )}>
                                 {contract.type === 'purchase' ? t.assets.purchaseContract : t.assets.saleContract}
                               </div>
-                              <h4 className="text-lg font-black text-gray-900">{contract.name}</h4>
+                              <h4 className="text-lg font-black text-gray-900">{translateName(contract.name, language)}</h4>
                               <span className="text-xs font-mono font-bold text-gray-400 tracking-tighter">{contract.id}</span>
                             </div>
                             <div className="flex items-center gap-4 mt-1">
@@ -1268,7 +1269,7 @@ const Assets: React.FC = () => {
                                     {mIdx + 1}
                                   </div>
                                   <div>
-                                    <div className="text-sm font-black text-gray-900">{meter.displayName || t.assets.unnamedMeter}</div>
+                                    <div className="text-sm font-black text-gray-900">{translateName(meter.displayName, language) || t.assets.unnamedMeter}</div>
                                     <div className="flex items-center gap-4 mt-1">
                                       <div className="text-[10px] font-bold text-gray-400">
                                         <span className="font-black">電號：</span>
@@ -1962,7 +1963,7 @@ const Assets: React.FC = () => {
                               {idx + 1}
                             </div>
                             <div>
-                              <div className="text-sm font-black text-gray-900">{meter.displayName || t.assets.unnamedMeter}</div>
+                              <div className="text-sm font-black text-gray-900">{translateName(meter.displayName, language) || t.assets.unnamedMeter}</div>
                               <div className="text-[10px] font-mono font-bold text-gray-400">{meter.taipowerId}</div>
                             </div>
                           </div>
@@ -2116,7 +2117,7 @@ const Assets: React.FC = () => {
                                 {idx + 1}
                               </div>
                               <div>
-                                <div className="text-base font-black text-gray-900">{meter.displayName || t.assets.unnamedMeter}</div>
+                                <div className="text-base font-black text-gray-900">{translateName(meter.displayName, language) || t.assets.unnamedMeter}</div>
                                 <div className="text-xs font-mono font-bold text-gray-400">{meter.taipowerId}</div>
                               </div>
                             </div>
@@ -2424,7 +2425,7 @@ const Assets: React.FC = () => {
                     {t.assets.monthlyBreakdown}
                   </h3>
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
-                    {newContract.meters?.[breakdownMeterIndex]?.displayName} ({newContract.meters?.[breakdownMeterIndex]?.taipowerId})
+                    {translateName(newContract.meters?.[breakdownMeterIndex]?.displayName || '', language)} ({newContract.meters?.[breakdownMeterIndex]?.taipowerId})
                   </p>
                 </div>
               </div>
@@ -2744,7 +2745,7 @@ const Assets: React.FC = () => {
                             {idx + 1}
                           </div>
                           <div>
-                            <div className="text-sm font-black text-gray-900">{meter.displayName}</div>
+                            <div className="text-sm font-black text-gray-900">{translateName(meter.displayName, language)}</div>
                             <div className="text-[10px] font-mono font-bold text-gray-400">{meter.taipowerId}</div>
                           </div>
                         </div>

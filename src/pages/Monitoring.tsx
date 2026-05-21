@@ -20,7 +20,7 @@ import { Link } from 'react-router-dom';
 import { MONITORED_METERS } from '../mockData';
 import { MeterStatus } from '../types';
 import { useLanguage } from '../LanguageContext';
-import { formatEnergy } from '../utils/contractUtils';
+import { formatEnergy, translateName } from '../utils/contractUtils';
 
 const Monitoring: React.FC = () => {
   const { t, language } = useLanguage();
@@ -77,11 +77,23 @@ const Monitoring: React.FC = () => {
         }
       };
 
+      const custEn = translateName(m.customerName, 'en').toLowerCase();
+      const dispEn = translateName(m.displayName || '', 'en').toLowerCase();
+      const contractEn = translateName(m.contractId, 'en').toLowerCase();
+      const custZh = m.customerName.toLowerCase();
+      const dispZh = (m.displayName || '').toLowerCase();
+      const contractZh = m.contractId.toLowerCase();
+      const query = searchQuery.toLowerCase();
+
       const matchesSearch = 
         m.taipowerId.includes(searchQuery) || 
-        m.customerName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        m.contractId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        getStatusLabel(status).toLowerCase().includes(searchQuery.toLowerCase());
+        custZh.includes(query) || 
+        custEn.includes(query) || 
+        dispZh.includes(query) || 
+        dispEn.includes(query) || 
+        contractZh.includes(query) || 
+        contractEn.includes(query) || 
+        getStatusLabel(status).toLowerCase().includes(query);
         
       return matchesTab && matchesCategory && matchesSearch;
     });
@@ -313,18 +325,18 @@ const Monitoring: React.FC = () => {
                     <td className="px-8 py-6">
                       <div className="flex flex-col">
                         <span className="text-sm font-black text-gray-900 font-mono tracking-tighter">{meter.taipowerId}</span>
-                        <span className="text-xs font-bold text-gray-400">{meter.displayName}</span>
+                        <span className="text-xs font-bold text-gray-400">{translateName(meter.displayName, language)}</span>
                       </div>
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex flex-col group/link">
-                        <span className="text-sm font-black text-gray-900">{meter.customerName}</span>
+                        <span className="text-sm font-black text-gray-900">{translateName(meter.customerName, language)}</span>
                         <Link 
                           to="/assets" 
                           state={{ customerName: meter.customerName, contractId: meter.contractId }}
                           className="text-[10px] text-gray-400 font-bold hover:text-[#9CB13A] flex items-center gap-1 transition-all mt-1"
                         >
-                          {meter.contractId} <ExternalLink size={10} />
+                          {translateName(meter.contractId, language)} <ExternalLink size={10} />
                         </Link>
                       </div>
                     </td>
